@@ -1,0 +1,8 @@
+root=true
+
+[*.{astro,,mjs,ts}]
+indent_style = tab
+
+[*.md,mdx]
+indent_size = 2
+indent_style = space
