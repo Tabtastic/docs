@@ -5,9 +5,20 @@ import starlight from "@astrojs/starlight";
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: "My Docs",
+			title: "Tabtastic Docs",
+			logo: {
+				dark: "./src/assets/wordmark-dark.svg",
+				light: "./src/assets/wordmark-light.svg",
+				replacesTitle: true,
+			},
+			editLink: {
+				baseUrl: "https://github.com/Tabtastic/docs/edit/main/docs/",
+			},
 			social: {
-				github: "https://github.com/withastro/starlight",
+				discord: "https://discord.gg/6UEYkQW",
+				github: "https://github.com/Tabtastic/docs",
+				facebook: "https://www.facebook.com/TabtasticApp",
+				youtube: "https://www.youtube.com/@tabtasticapp/videos",
 			},
 			sidebar: [
 				{
