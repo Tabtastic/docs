@@ -1,0 +1,63 @@
+---
+interface Argument {
+	name: string;
+	type: string;
+	required?: boolean;
+	description: string;
+}
+
+interface Props {
+	args: Argument[];
+}
+
+const { args } = Astro.props;
+---
+
+{
+	(args.length > 0) ?
+	<table>
+		<thead>
+			<tr>
+				<td colspan="3">Command Arguments</td>
+			</tr>
+			<tr>
+				<td>Name</td>
+				<td>Type</td>
+				<td>Description</td>
+			</tr>
+		</thead>
+
+		<tbody>
+			{ args.map((arg) => (
+				<tr class:list={{ optional: !arg.required }}>
+					<td>{ arg.name }</td>
+					<td>{ arg.type }</td>
+					<td>{ arg.description }</td>
+				</tr>
+			)) }
+		</tbody>
+	</table>
+	: <p>This command has no arguments.</p>
+}
+
+<style>
+	p {
+		font-style: italic;
+	}
+
+	table {
+		& thead {
+			font-weight: bold;
+		}
+
+		& tbody > tr {
+			&.optional {
+				font-style: italic;
+			}
+
+			& td:not(:last-of-type) {
+				white-space: nowrap;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,167 @@
+---
+title: "Discord Command Reference"
+description: "All the Discord commands supported by Tabtastic"
+---
+
+import { Badge } from "@astrojs/starlight/components";
+import CommandArguments from "@components/CommandArguments.astro";
+
+There are two categories of Discord commands provided by Tabtastic, [Participant Commands](#participant-commands), which are available to any speaker or judge registered with Tabtastic, and [Admin Commands](#admin-commands), which are only available to Tab Staff (see [Adding Staff](/guides/creating-a-tournament#staff)), except for [`/meeting`](#meeting).
+
+Most commands take 'arguments', which are options that change the behaviour of the command. Some arguments are optional, and are written in *italics*. The different types of arguments are explained below:
+
+| Type | Description |
+| --- | --- |
+| boolean | A true/false or on/off value |
+| channel | A Discord channel, usually a text channel |
+| number | A number, may be a whole or decimal number |
+| string | A piece of text |
+| rounds | A series of round abbreviations, separated by commas, e.g. `R1,ESF` for Round 1 and ESL Semifinals) |
+| time | A 24 hour time, relative to the tournament's configured timezone |
+| user | A user on Discord |
+
+## Participant Commands
+
+### `/callback` <Badge text="Judge Only" variant="caution" />
+
+Notifies speakers using the configured debates channel that they should return to the room for the oral adjudication. Fails if the round is silent, the draw has not released, the judge is not adjudicating in this round, or the round has been marked as completed.
+
+<CommandArguments args={[]} />
+
+### `/link`
+
+Links the user to a participant on tab, based on their link code or email.
+
+<CommandArguments args={[
+	{ name: "code", type: "string", required: true, description: "The link code or email corresponding to the participant." },
+]} />
+
+### `/tab`
+
+Sends the participant's private URL for feedback and ballot submissions in a direct message.
+
+<CommandArguments args={[]} />
+
+## Admin Commands
+
+:::caution
+If Tabtastic restarts (such as for an update), interactive or dynamic widgets (like [`/categorypicker`](#categorypicker) or [`/countdown`](#countdown)) may stop working. This is a known limitation which is currently being worked around. If a widget stops responding, delete it and create a new one. Tabtastic does not normally restart during the weekend, so this should not affect most tournaments.
+:::
+
+### `/categorypicker`
+
+Creates a message in the channel the command was executed in with a button for each speaker category marked as Selectable, allowing speakers to toggle their speaker status for a given category by clicking on the corresponding button. Fails if there are no speaker categories marked as Selectable.
+
+<CommandArguments args={[]} />
+
+### `/checkin`
+
+Starts a check in session on Discord, tagging `@everyone`, allowing participants to check in by clicking the button on the corresponding announcement. A reminder, also tagging `@everyone`, will be posted 3 minutes before check in closes, if the check in window is longer than 3 minutes.
+
+<CommandArguments args={[
+	{ name: "closes", type: "time", required: true, description: "The time check in should close." },
+	{ name: "opens", type: "time", description: "The time check in should open. Defaults to now if not provided." },
+	{ name: "channel", type: "channel", description: "The text channel to post the check in message into. Defaults to the announcements channel." },
+	{ name: "chicken", type: "boolean", description: "Whether secret chicken powers should be activated. Defaults to false." },
+]} />
+
+### `/countdown`
+
+Creates a simple countdown timer in the channel the command was executed in, similar to the one used by [`/release`](#release). A second announcement will be posted when the timer ends.
+
+<CommandArguments args={[
+	{ name: "duration", type: "number", required: true, description: "The duration of the timer, in minutes." },
+	{ name: "name", type: "string", description: "The name of the timer, defaults to 'Countdown'." }
+]} />
+
+### `/draw`
+
+Starts the process for releasing the draw and notifying participants.
+
+<CommandArguments args={[
+	{ name: "rounds", type: "rounds", description: "The rounds to release the draw for. Defaults to all rounds with confirmed but unreleased draws." },
+	{ name: "at", type: "time", description: "The time to release the draw at. Defaults to now." },
+	{ name: "private", type: "boolean", description: "Only send the links for the debates to participants instead of publishing them on Tabbycat and in the general announcement. Defaults to false." },
+]} />
+
+### `/judgecheckin`
+
+Creates a message in the channel the command was executed in with buttons for judges to check themselves in and out with, optionally expiring at a certain time. Speakers using the buttons has no effect.
+
+<CommandArguments args={[
+	{ name: "closes", type: "time", description: "The time check in should close. Defaults to never." },
+	{ name: "chicken", type: "boolean", description: "Whether secret chicken powers should be activated. Defaults to false." },
+]} />
+
+### `/meeting`
+
+Sets the link to join debates for a set of rooms. See [Using Zoom Allocations](/guides/zoom).
+
+:::note
+`/meeting` is a more permissive admin command. Most admin commands require the configured tab role, whereas anyone with the configured staff role, which is automatically given to any tournament staff, can use `/meeting`.
+:::
+
+:::caution
+`/meeting` currently makes use of the old 'building' system, which will soon be replaced with more general purpose 'zones'. This documentation will be updated once the transition is complete.
+:::
+
+<CommandArguments args={[
+	{ name: "building", type: "string", required: true, description: "The building to set the join link for, affecting all rooms assigned to that building." },
+	{ name: "link", type: "string", required: true, description: "The join link to use for the affected rooms." },
+]} />
+
+### `/purgeroles`
+
+Deletes all roles automatically generated by Tabtastic.
+
+:::caution
+This command is very slow and is usually unnecessary, it should only be used for troubleshooting when directed by the Tabtastic Team.
+:::
+
+<CommandArguments args={[]} />
+
+### `/release`
+
+Announces the motion, and info slide if provided, in the configured announcements channel after a countdown, beginning a countdown for prep time after the motion is released. The countdown before an info slide is always 60 seconds.
+
+<CommandArguments args={[
+	{ name: "rounds", type: "rounds", description: "The rounds to release the motion for. Defaults to all rounds with released draws." },
+	{ name: "at", type: "time", description: "The time to start releasing the motion at. Defaults to now." },
+	{ name: "immediate", type: "boolean", description: "Skip the countdown before announcing the motion. If the motion has an info slide, this will be released immediately, and you will be prompted to then release the motion. Defaults to false." },
+	{ name: "skip-prep", type: "boolean", description: "Does not start a countdown for prep time. Defaults to false." },
+	{ name: "countdown", type: "number", description: "The time before the motion is released, after the info slide is released if one is provided. Defaults to 60 seconds." },
+]} />
+
+### `/schedule`
+
+Creates a message in the channel the command was executed in the configured schedule (see [Setting a Schedule](/guides/creating-a-tournament#schedule)), using Discord timestamps so that the times display in the user's local timezone.
+
+<CommandArguments args={[]} />
+
+### `/setlink`
+
+Forcibly links a user to a given participant on tab, based on their invite code or email.
+
+<CommandArguments args={[
+	{ name: "user", type: "user", required: true, description: "The Discord user to be linked to a participant." },
+	{ name: "code", type: "string", required: true, description: "The link code or email corresponding to the participant." },
+	{ name: "silent", type: "boolean", description: "Hide the success message a user would see normally. Defaults to false."}
+]} />
+
+### `/unlink`
+
+Unlinks a user from a given participant on tab.
+
+<CommandArguments args={[
+	{ name: "user", type: "user", required: true, description: "The Discord user to be unlinked." },
+]} />
+
+### `/update`
+
+Starts updating Tabtastic with the latest information from the connected tab. See [Synchronising with the Tab](/guides/creating-a-tournament#sync).
+
+:::caution
+The `/update` command is slowly being phased out in favour of triggering updates via the website and receiving a notification when it is finished, since updates can be a lengthy process.
+:::
+
+<CommandArguments args={[]} />
