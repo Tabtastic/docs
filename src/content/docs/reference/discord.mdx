@@ -120,6 +120,14 @@ This command is very slow and is usually unnecessary, it should only be used for
 
 <CommandArguments args={[]} />
 
+### `/refreshdraw`
+
+Fetches changes to the draw (e.g. judge and room swaps), and notifies participants who are affected.
+
+<CommandArguments args={[
+	{ name: "rounds", type: "rounds", description: "The rounds to refresh the draw for. Defaults to all rounds with released draws that are not yet complete." },
+]} />
+
 ### `/release`
 
 Announces the motion, and info slide if provided, in the configured announcements channel after a countdown, beginning a countdown for prep time after the motion is released. The countdown before an info slide is always 60 seconds.
