@@ -3,6 +3,8 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+	site: "https://docs.tabtastic.net",
+
 	integrations: [
 		starlight({
 			title: "Tabtastic Docs",
